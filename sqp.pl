@@ -22,6 +22,8 @@ sq_overlap([X|Xs], List):-
 	sq_overlap(X, List),
 	sq_overlap(Xs, List).
 
+sq_overlap([], _).
+
 sq_overlap(X, [Y|Ys]):-
 	sq_validity(X, Y),
 	sq_overlap(X, Ys).
