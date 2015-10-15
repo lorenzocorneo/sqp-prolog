@@ -3,6 +3,12 @@ sqp(N, Xs, _S):-
 	coords_validity(N, Xs),
 	sq_overlap(Xs).
 
+% Generate coordinate range for permutation
+gen_coord(N, L, R) :-
+    max_size(N, S),
+    T is S - L,
+    numlist(0, T, R).
+
 % Square ADT.
 sq(L, coord(X, Y)):- L > 0, coord(X, Y).
 
