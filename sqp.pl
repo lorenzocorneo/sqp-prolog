@@ -9,14 +9,17 @@ gen_coord(N, L, R) :-
     T is S - L,
     numlist(0, T, R).
 
+% Check whether the current configuration of squares fit in the enclosing square
 check_sq_fit([sq(L, coord(X, Y)) | Xs], S) :-
-    Xt is X + L,
-    Xt =< S,
-    Yt is Y + L,
-    Yt =< S,
+    check_coord_fit(X, L, S),
+    check_coord_fit(Y, L, S),
     check_sq_fit(Xs, S).
 
 check_sq_fit([], _).
+
+% Check if coordinate plus length is <= enclosing square
+check_coord_fit(C, L, S) :-
+    C + L =< S.
 
 % Square ADT.
 sq(L, coord(X, Y)):- L > 0, coord(X, Y).
