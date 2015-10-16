@@ -4,14 +4,17 @@ sqp(N, Xs, _S):-
     coords_validity(N, Xs),
     sq_overlap(Xs).
 
+% EXPERIMENTAL
 lala(Range, C1, C2) :-
     permutation(Range, [C1, C2 | Xs]).
 
+% EXPERIMENTAL
 koko(Range, N, Acc, Ret) :-
     lala(Range, C),
     koko(Range, N - 1, [C | Acc], Ret).
 koko(_, 0, Acc, Acc).
-    
+
+% EXPERIMENTAL
 % Assign coordinates from a spcific range
 pick_coord(Range, X, Y) :-
     random_permutation(Range, ListA),
