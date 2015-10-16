@@ -9,6 +9,15 @@ gen_coord(N, L, R) :-
     T is S - L,
     numlist(0, T, R).
 
+check_sq_fit([sq(L, coord(X, Y)) | Xs], S) :-
+    Xt is X + L,
+    Xt =< S,
+    Yt is Y + L,
+    Yt =< S,
+    check_sq_fit(Xs, S).
+
+check_sq_fit([], _).
+
 % Square ADT.
 sq(L, coord(X, Y)):- L > 0, coord(X, Y).
 
