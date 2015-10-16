@@ -1,7 +1,53 @@
 % The top of the iceberg.
-sqp(N, Xs, _S):- 
-	coords_validity(N, Xs),
-	sq_overlap(Xs).
+sqp(N, Xs, _S):-
+    assign_range(Xs, N, [], Sq),
+    coords_validity(N, Xs),
+    sq_overlap(Xs).
+
+lala(Range, C1, C2) :-
+    permutation(Range, [C1, C2 | Xs]).
+
+koko(Range, N, Acc, Ret) :-
+    lala(Range, C),
+    koko(Range, N - 1, [C | Acc], Ret).
+koko(_, 0, Acc, Acc).
+    
+% Assign coordinates from a spcific range
+pick_coord(Range, X, Y) :-
+    random_permutation(Range, ListA),
+    [X | _] = ListA,
+    random_permutation(ListA, ListB),
+    [Y | _] = ListB.
+
+% Assign possible coordinates combination to each square
+assign_range([sq(L, coord(X, Y)) | Xs], N, Acc, Ret) :-
+    gen_combinations(N, L, Comb),
+    assign_range(Xs, N, [pos_sq(Comb, sq(L, coord(X, Y))) | Acc], Ret).
+
+assign_range([], _, Acc, Acc).
+
+% Generate possible combinations of coordinates for a square
+gen_combinations(N, L, Res) :-
+    gen_coord(N, L, R),
+    gen_comb(R, R, [], Res).
+
+% Iterate through every coordinate and produce combinations
+gen_comb(List, [X | Xs], Acc, Res) :-
+    combine(X, List, [], Res1),
+    merge(Res1, Acc, R),
+    gen_comb(List, Xs, R, Res).
+
+gen_comb(_, [], Acc, Acc).
+
+% Combine one possible coordinate with all the others
+combine(X, [Y | Ys], Acc, Res) :-
+    combine(X, Ys, [(X, Y) | Acc], Res).
+combine(X, [], Acc, Acc).
+
+% Merge two lists - not in order!
+merge([X | Xs], List, Res) :-
+    merge(Xs, [X | List], Res).
+merge([], List, List).
 
 % Generate coordinate range for permutation
 gen_coord(N, L, R) :-
@@ -21,6 +67,7 @@ check_sq_fit([], _).
 check_coord_fit(C, L, S) :-
     C + L =< S.
 
+pos_sq(Range, sq(L, coord(X, Y))).
 % Square ADT.
 sq(L, coord(X, Y)):- L > 0, coord(X, Y).
 
