@@ -1,3 +1,25 @@
+% Entry point.
+% N: The number of squares to pack
+% In: List of variables to bind solution coordinates,
+% it's in the form [(X0, Y0), (X1, Y1), (X2, Y2)...]
+% S: The side of the optimal surrounding square,
+% assume that we know it a priori
+sqp(N, In, S):-
+    % Generate possible coordinates and every combination of X and Y
+    gen_combinations(S, 1, Res),
+    % Pick a set from the possible coordinates
+    n_from_m(Res,In),
+    % Map raw coordinates to sq/2 ADT
+    dyn_var(N,In,[],MyRes),
+    reverse(MyRes, Rev),
+    % Check if assigned coordinates are between 0 and maximum possible coordinate
+    coords_validity(N, Rev),
+    % Check if squares overlap each other
+    sq_overlap(Rev),
+    % Check whether current configuration of coordinates fits optimal surrounding square
+    check_sq_fit(Rev, S).
+
+% Combine Mlist with every variable in Nlist
 n_from_m(Mlist,[E|Nlist]) :-
 	select(E,Mlist,Mrest),
 	n_from_m(Mrest,Nlist).
@@ -6,26 +28,16 @@ n_from_m(_,[]).
 select(X,[X|T],T).
 select(X,[Y|T],[Y|R]) :- select(X,T,R).
 
-
-% dynamic var
+% Maps raw coordinates to sq/2 ADT
+% N: size of the current square
+% Res: Result
 dyn_var(N, [H|T], Acc, Res):-
 	(X,Y) = H,
 	Res2 = [sq(N, coord(X,Y))|Acc],
 	M is N-1,
 	dyn_var(M, T, Res2, Res).
 
-dyn_var(0,_,Res, Res).	
-
-
-% The top of the iceberg.
-sqp(N, In, S):-
-    gen_combinations(S, 1, Res),
-    n_from_m(Res,In),
-    dyn_var(N,In,[],MyRes),
-    reverse(MyRes, Rev),
-    coords_validity(N, Rev),
-    sq_overlap(Rev),
-    check_sq_fit(Rev, S).
+dyn_var(0,_,Res, Res).
 
 % Generate possible combinations of coordinates for a square
 % If L = 1, we get all possible coordinates
@@ -56,7 +68,7 @@ gen_coord(N, L, R) :-
     T is N - L,
     numlist(0, T, R).
 
-% Check whether the current configuration of squares fit in the enclosing square
+% Check whether the current configuration of squares fits in the enclosing square
 check_sq_fit([sq(L, coord(X, Y)) | Xs], S) :-
     check_coord_fit(X, L, S),
     check_coord_fit(Y, L, S),
@@ -82,6 +94,7 @@ coords_validity(_, []).
 coords_validity(N, [sq(L,X)|Xs]):- coord_constraint(N, X, L), coords_validity(N, Xs).
 
 % Checks for overlapping squares.
+% It evaluates each square with all other
 sq_overlap(List):-
 	sq_overlap(List, List).
 
