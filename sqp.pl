@@ -6,18 +6,31 @@ n_from_m(_,[]).
 select(X,[X|T],T).
 select(X,[Y|T],[Y|R]) :- select(X,T,R).
 
+
+% dynamic var
+dyn_var(N, [H|T], Acc, Res):-
+	(X,Y) = H,
+	Res2 = [sq(N, coord(X,Y))|Acc],
+	M is N-1,
+	dyn_var(M, T, Res2, Res).
+
+dyn_var(0,_,Res, Res).	
+
+
 % The top of the iceberg.
-sqp(N, [Sq0,Sq1,Sq2], S):-
+sqp(N, In, S):-
     gen_combinations(S, 1, Res),
-    n_from_m(Res, [(Sq0x,Sq0y), (Sq1x,Sq1y), (Sq2x,Sq2y)]),
-    % write([(Sq0x,Sq0y), (Sq1x,Sq1y), (Sq2x,Sq2y)]),
-	Sq0 = sq(3, coord(Sq0x,Sq0y)),
-	Sq1 = sq(2, coord(Sq1x,Sq1y)),
-	Sq2 = sq(1, coord(Sq2x,Sq2y)),
-    Xs = [Sq0,Sq1,Sq2],
-    coords_validity(N, Xs),
-    sq_overlap(Xs),
-    check_sq_fit(Xs, S).
+    % n_from_m(Res, [(Sq0x,Sq0y), (Sq1x,Sq1y), (Sq2x,Sq2y)]),
+    n_from_m(Res,In),
+    dyn_var(N,In,[],MyRes),
+    reverse(MyRes, Rev),
+	% Sq0 = sq(3, coord(Sq0x,Sq0y)),
+	% Sq1 = sq(2, coord(Sq1x,Sq1y)),
+	% Sq2 = sq(1, coord(Sq2x,Sq2y)),
+ %    Xs = [Sq0,Sq1,Sq2],
+    coords_validity(N, Rev),
+    sq_overlap(Rev),
+    check_sq_fit(Rev, S).
 	
 % Remove it in future version
 % Assign possible coordinates combination to each square
