@@ -20,25 +20,12 @@ dyn_var(0,_,Res, Res).
 % The top of the iceberg.
 sqp(N, In, S):-
     gen_combinations(S, 1, Res),
-    % n_from_m(Res, [(Sq0x,Sq0y), (Sq1x,Sq1y), (Sq2x,Sq2y)]),
     n_from_m(Res,In),
     dyn_var(N,In,[],MyRes),
     reverse(MyRes, Rev),
-	% Sq0 = sq(3, coord(Sq0x,Sq0y)),
-	% Sq1 = sq(2, coord(Sq1x,Sq1y)),
-	% Sq2 = sq(1, coord(Sq2x,Sq2y)),
- %    Xs = [Sq0,Sq1,Sq2],
     coords_validity(N, Rev),
     sq_overlap(Rev),
     check_sq_fit(Rev, S).
-	
-% Remove it in future version
-% Assign possible coordinates combination to each square
-assign_range([sq(L, coord(X, Y)) | Xs], N, Acc, Ret) :-
-    gen_combinations(N, L, Comb),
-    assign_range(Xs, N, [pos_sq(Comb, sq(L, coord(X, Y))) | Acc], Ret).
-assign_range([], _, Acc, Acc).
-% End of removal
 
 % Generate possible combinations of coordinates for a square
 % If L = 1, we get all possible coordinates
@@ -66,7 +53,6 @@ merge([], List, List).
 
 % Generate coordinate range for permutation
 gen_coord(N, L, R) :-
-    % max_size(N, S),
     T is N - L,
     numlist(0, T, R).
 
@@ -117,15 +103,6 @@ sq_validity(sq(L1, coord(X1, Y1)), sq(L2, coord(X2, Y2))):-
 	X2+L2=<X1;
 	Y1+L1=<Y2;
 	Y2+L2=<Y1.
-
-% A square should be either on the right or on the left of another square
-x_axis(L1, X1, L2, X2):-
-	X1 + L1 =< X2;
-	X2 + L2 =< X1.
-% A square should be either above or below of another square
-y_axis(L1, Y1, L2, Y2):-
-	Y1 + L1 =< L2;
-	Y2 + L2 >= Y1.
 
 % States the maximum coordinate for the system.
 max_size(N, S):- sigma(1, N, S).
