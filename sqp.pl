@@ -1,3 +1,12 @@
+sqp_zero(N,In):-
+ S = N,
+ T is S+1,
+(sqp(N,In,S) -> true ; sqp_zero(N,In, T)).
+
+sqp_zero(N,In,S):-
+	T is S+1,
+	(sqp(N,In,S) -> true ; sqp_zero(N,In,T)).
+
 % Entry point.
 % N: The number of squares to pack
 % In: List of variables to bind solution coordinates,
