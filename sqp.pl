@@ -17,7 +17,14 @@ sqp(N, In, S):-
     % Check if squares overlap each other
     sq_overlap(Rev),
     % Check whether current configuration of coordinates fits optimal surrounding square
-    check_sq_fit(Rev, S).
+    check_sq_fit(Rev, S),
+    pretty_printing(Rev).
+
+pretty_printing([sq(N, coord(X, Y)) | Xs]) :-
+    format('Size: ~d, X: ~d, Y: ~d~n', [N, X, Y]),
+    pretty_printing(Xs).
+
+pretty_printing([]).
 
 % Combine Mlist with every variable in Nlist
 n_from_m(Mlist,[E|Nlist]) :-
