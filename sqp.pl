@@ -1,35 +1,28 @@
+n_from_m(Mlist,[E|Nlist]) :-
+	select(E,Mlist,Mrest),
+	n_from_m(Mrest,Nlist).
+n_from_m(_,[]).
+
+select(X,[X|T],T).
+select(X,[Y|T],[Y|R]) :- select(X,T,R).
+
 % The top of the iceberg.
-sqp(N, Xs, _S):-
-    assign_range(Xs, N, [], Sq),
+sqp(N, Xs, S):-
+    gen_combinations(N, 1, Res),
+    n_from_m(Res, [Sq0, Sq1, S2]),
     coords_validity(N, Xs),
     sq_overlap(Xs).
-
-% EXPERIMENTAL
-lala(Range, C1, C2) :-
-    permutation(Range, [C1, C2 | Xs]).
-
-% EXPERIMENTAL
-koko(Range, N, Acc, Ret) :-
-    lala(Range, C),
-    koko(Range, N - 1, [C | Acc], Ret).
-koko(_, 0, Acc, Acc).
-
-% EXPERIMENTAL
-% Assign coordinates from a spcific range
-pick_coord(Range, X, Y) :-
-    random_permutation(Range, ListA),
-    [X | _] = ListA,
-    random_permutation(ListA, ListB),
-    [Y | _] = ListB.
-
+	
+% Remove it in future version
 % Assign possible coordinates combination to each square
 assign_range([sq(L, coord(X, Y)) | Xs], N, Acc, Ret) :-
     gen_combinations(N, L, Comb),
     assign_range(Xs, N, [pos_sq(Comb, sq(L, coord(X, Y))) | Acc], Ret).
-
 assign_range([], _, Acc, Acc).
+% End of removal
 
 % Generate possible combinations of coordinates for a square
+% If L = 1, we get all possible coordinates
 gen_combinations(N, L, Res) :-
     gen_coord(N, L, R),
     gen_comb(R, R, [], Res).
@@ -44,8 +37,8 @@ gen_comb(_, [], Acc, Acc).
 
 % Combine one possible coordinate with all the others
 combine(X, [Y | Ys], Acc, Res) :-
-    combine(X, Ys, [(X, Y) | Acc], Res).
-combine(X, [], Acc, Acc).
+    combine(X, Ys, [(X,Y) | Acc], Res).
+combine(_X, [], Acc, Acc).
 
 % Merge two lists - not in order!
 merge([X | Xs], List, Res) :-
@@ -70,7 +63,6 @@ check_sq_fit([], _).
 check_coord_fit(C, L, S) :-
     C + L =< S.
 
-pos_sq(Range, sq(L, coord(X, Y))).
 % Square ADT.
 sq(L, coord(X, Y)):- L > 0, coord(X, Y).
 
