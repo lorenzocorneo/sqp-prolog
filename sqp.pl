@@ -1,19 +1,10 @@
-sqp_zero(N,In):-
- S = N,
- T is S+1,
-(sqp(N,In,S) -> true ; sqp_zero(N,In, T)).
-
-sqp_zero(N,In,S):-
-	T is S+1,
-	(sqp(N,In,S) -> true ; sqp_zero(N,In,T)).
-
 % Entry point.
 % N: The number of squares to pack
 % In: List of variables to bind solution coordinates,
 % it's in the form [(X0, Y0), (X1, Y1), (X2, Y2)...]
 % S: The side of the optimal surrounding square,
 % assume that we know it a priori
-sqp(N, In, S):-
+sqp_with_s(N, In, S):-
     % Generate possible coordinates and every combination of X and Y
     gen_combinations(S, 1, Res),
     % Pick a set from the possible coordinates
@@ -27,13 +18,25 @@ sqp(N, In, S):-
     sq_overlap(Rev),
     % Check whether current configuration of coordinates fits optimal surrounding square
     check_sq_fit(Rev, S),
-    pretty_printing(Rev).
+    pretty_printing(Rev, S).
 
-pretty_printing([sq(N, coord(X, Y)) | Xs]) :-
+% Search for size of optimal enclosing square as well
+sqp_no_s(N,In):-
+    S is N + N - 1,
+    T is S+1,
+    (sqp_with_s(N,In,S) -> true ; sqp_no_s(N,In, T)).
+
+sqp_no_s(N,In,S):-
+    T is S+1,
+    (sqp_with_s(N,In,S) -> true ; sqp_no_s(N,In,T)).
+
+% Prints result in a human readable way
+pretty_printing([sq(N, coord(X, Y)) | Xs], S) :-
     format('Size: ~d, X: ~d, Y: ~d~n', [N, X, Y]),
-    pretty_printing(Xs).
+    pretty_printing(Xs, S).
 
-pretty_printing([]).
+pretty_printing([], S) :-
+    format('Optimal size: ~d~n', [S]).
 
 % Combine Mlist with every variable in Nlist
 n_from_m(Mlist,[E|Nlist]) :-
