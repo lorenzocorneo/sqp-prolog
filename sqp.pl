@@ -7,11 +7,17 @@ select(X,[X|T],T).
 select(X,[Y|T],[Y|R]) :- select(X,T,R).
 
 % The top of the iceberg.
-sqp(N, Xs, S):-
-    gen_combinations(N, 1, Res),
-    n_from_m(Res, [Sq0, Sq1, S2]),
+sqp(N, [Sq0,Sq1,Sq2], S):-
+    gen_combinations(S, 1, Res),
+    n_from_m(Res, [(Sq0x,Sq0y), (Sq1x,Sq1y), (Sq2x,Sq2y)]),
+    % write([(Sq0x,Sq0y), (Sq1x,Sq1y), (Sq2x,Sq2y)]),
+	Sq0 = sq(3, coord(Sq0x,Sq0y)),
+	Sq1 = sq(2, coord(Sq1x,Sq1y)),
+	Sq2 = sq(1, coord(Sq2x,Sq2y)),
+    Xs = [Sq0,Sq1,Sq2],
     coords_validity(N, Xs),
-    sq_overlap(Xs).
+    sq_overlap(Xs),
+    check_sq_fit(Xs, S).
 	
 % Remove it in future version
 % Assign possible coordinates combination to each square
@@ -47,8 +53,8 @@ merge([], List, List).
 
 % Generate coordinate range for permutation
 gen_coord(N, L, R) :-
-    max_size(N, S),
-    T is S - L,
+    % max_size(N, S),
+    T is N - L,
     numlist(0, T, R).
 
 % Check whether the current configuration of squares fit in the enclosing square
@@ -70,11 +76,11 @@ sq(L, coord(X, Y)):- L > 0, coord(X, Y).
 coord(X, Y):- X >= 0, Y >= 0.
 
 % Checks the validity of a single coordinate accordingly with the coordinate system.
-coord_constraint(N, coord(X, Y)):- max_size(N, S), X < S, Y < S.
+coord_constraint(N, coord(X, Y), L):- max_size(N, S), X + L < S, Y + L < S.
 
 % Recursive checking of the correctness of all the coordinates.
 coords_validity(_, []).
-coords_validity(N, [sq(_,X)|Xs]):- coord_constraint(N, X), coords_validity(N, Xs).
+coords_validity(N, [sq(L,X)|Xs]):- coord_constraint(N, X, L), coords_validity(N, Xs).
 
 % Checks for overlapping squares.
 sq_overlap(List):-
