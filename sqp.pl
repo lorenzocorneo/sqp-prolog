@@ -25,7 +25,7 @@ sqp_with_s(N, In, S):-
 % + N: The number of squares to pack
 % - In: List of variables to bind solution coordinates
 sqp_no_s(N, In):-
-    S = N,
+    S = N + N - 1,
     T is S + 1,
     (sqp_with_s(N, In, S) -> true ; sqp_no_s(N, In, T)).
 
