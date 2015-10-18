@@ -5,6 +5,7 @@
 % S: The side of the optimal surrounding square,
 % assume that we know it a priori
 sqp_with_s(N, In, S):-
+    get_time(Time0),
     % Generate possible coordinates and every combination of X and Y
     gen_combinations(S, 1, Res),
     % Pick a set from the possible coordinates
@@ -18,11 +19,11 @@ sqp_with_s(N, In, S):-
     sq_overlap(Rev),
     % Check whether current configuration of coordinates fits optimal surrounding square
     check_sq_fit(Rev, S),
-    pretty_printing(Rev, S).
+    pretty_printing(Rev, S, Time0).
 
 % Search for size of optimal enclosing square as well
 sqp_no_s(N,In):-
-    S is N + N - 1,
+    S = N,
     T is S+1,
     (sqp_with_s(N,In,S) -> true ; sqp_no_s(N,In, T)).
 
@@ -31,12 +32,15 @@ sqp_no_s(N,In,S):-
     (sqp_with_s(N,In,S) -> true ; sqp_no_s(N,In,T)).
 
 % Prints result in a human readable way
-pretty_printing([sq(N, coord(X, Y)) | Xs], S) :-
+pretty_printing([sq(N, coord(X, Y)) | Xs], S, Diff) :-
     format('Size: ~d, X: ~d, Y: ~d~n', [N, X, Y]),
-    pretty_printing(Xs, S).
+    pretty_printing(Xs, S, Diff).
 
-pretty_printing([], S) :-
-    format('Optimal size: ~d~n', [S]).
+pretty_printing([], S, Time0) :-
+    format('Optimal size: ~d~n', [S]),
+    get_time(Time1),
+    Diff is Time1 - Time0,
+    format('Time is seconds: ~f~n', [Diff]).
 
 % Combine Mlist with every variable in Nlist
 n_from_m(Mlist,[E|Nlist]) :-
