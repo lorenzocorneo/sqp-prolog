@@ -113,7 +113,8 @@ merge([], List, List).
 % [0, 1, 2, ..., S - L]
 gen_coord(N, L, R) :-
     T is N - L,
-    numlist(0, T, R).
+    numlist(0, T, F),
+    reverse(F,R).
 
 % Check whether the current configuration of squares fits in the enclosing square
 % + Xs: Current squares configuration
